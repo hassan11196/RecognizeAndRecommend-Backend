@@ -17,7 +17,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
 
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,11 +40,11 @@ INSTALLED_APPS = (
     'django_celery_beat',  # task scheduler
     'djmoney',  # money object
     'health_check',
-    'health_check.db',                          # stock Django health checkers
+    'health_check.db',  # stock Django health checkers
     'health_check.cache',
     'health_check.storage',
     'health_check.contrib.migrations',
-    'health_check.contrib.celery_ping',         # requires celery
+    'health_check.contrib.celery_ping',  # requires celery
 
     # Your apps
     'src.notifications',
@@ -102,15 +101,18 @@ CELERY_TIMEZONE = 'UTC'
 
 # MySQL
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': os.getenv('DB_NAME'),
+    #     'USER': os.getenv('DB_USER'),
+    #     'PASSWORD': os.getenv('DB_PASSWORD'),
+    #     'HOST': os.getenv('DB_HOST', 'db'),
+    #     'PORT': os.getenv('DB_PORT'),
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-}
 
 # General
 APPEND_SLASH = True
