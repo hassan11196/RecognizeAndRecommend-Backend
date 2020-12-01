@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "env/bin/python3",
+  "python.pythonPath": "/home/hassan11196/.virtualenvs/python-django-drf-boilerplate-FGyt0A6u/bin/python",
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
