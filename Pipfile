@@ -45,6 +45,9 @@ boto3 = "==1.14.16"
 django-health-check = "==3.16.1"
 psycopg2-binary = "*"
 whitenoise = "*"
+pillow = "*"
+opencv-contrib-python = "*"
+opencv-python = "*"
 
 [dev-packages]
 

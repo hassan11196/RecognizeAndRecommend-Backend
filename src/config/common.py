@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'src.users',
     'src.social',
     'src.common',
+    'src.recognition'
 
     # Third party optional apps
     # app must be placed somewhere after all the apps that are going to be generating activities
@@ -329,7 +330,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',

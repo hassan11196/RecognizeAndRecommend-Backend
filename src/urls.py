@@ -22,6 +22,9 @@ router = DefaultRouter()
 router.registry.extend(usersRouter.registry)
 
 urlpatterns = [
+    # Recognjtion Endpoint
+    path('recognition/', include('src.recognition.urls')),
+
     # admin panel
     path('admin/', admin.site.urls),
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
@@ -46,7 +49,6 @@ urlpatterns = [
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-
     url(r'^health/', include('health_check.urls')),
 
     # the 'api-root' from django rest-frameworks default router
