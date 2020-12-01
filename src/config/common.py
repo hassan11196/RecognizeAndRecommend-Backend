@@ -91,7 +91,7 @@ CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://redis:6379')
 ADMINS = ()
 
 # Sentry
-sentry_sdk.init(dsn=os.getenv('SENTRY_DSN', ''), integrations=[DjangoIntegration()])
+# sentry_sdk.init(dsn=os.getenv('SENTRY_DSN', ''), integrations=[DjangoIntegration()])
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True

@@ -45,11 +45,14 @@ boto3 = "==1.14.16"
 django-health-check = "==3.16.1"
 psycopg2-binary = "*"
 whitenoise = "*"
-pillow = "*"
+Pillow = "*"
 opencv-contrib-python = "*"
 opencv-python = "*"
+numpy = "*"
+django = "==3.0.8"
+markdown = "==3.2.2"
 
 [dev-packages]
 
 [requires]
-python_version = "3.8"
+python_version = "3.7"
