@@ -63,6 +63,16 @@ class FaceRecognitionView(APIView):
             return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})
 
 
-class TrainerView():
+class TrainerView(APIView):
+    def post(self, request):
+        pass
+
+
+class saveImage(APIView):
+    def post(self, request):
+        pass
+
+
+class createUser(APIView):
     def post(self, request):
         pass
