@@ -2,14 +2,17 @@ import os
 import base64
 from PIL import Image
 import cv2
-import numpy
+import numpy as np
+import time
 
 from django.http.response import JsonResponse
 from django.shortcuts import render
+from django.core.files.base import ContentFile
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import JSONParser
+from .models import FaceImage, UserImageSet
 
-from django.core.files.base import ContentFile
 # Create your views here.
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
@@ -26,8 +29,10 @@ minH = 0.1 * 100
 
 
 class FaceRecognitionView(APIView):
+    parser_classes = (JSONParser, )
+
     def post(self, request):
-        face = request.POST.get('face')
+        face = request.data.get('face')
         if face:
             format, imgstr = face.split(';base64,')
             ext = format.split('/')[-1]
@@ -36,7 +41,7 @@ class FaceRecognitionView(APIView):
             pil_img = Image.open(data).convert('RGB')
 
             print(pil_img)
-            img = numpy.array(pil_img)
+            img = np.array(pil_img)
             # Convert RGB to BGR
             img = img[:, :, ::-1].copy()
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -53,7 +58,8 @@ class FaceRecognitionView(APIView):
 
             # Check if confidence is less them 100 ==> "0" is perfect match
             if (confidence < 100):
-                id = names[id]
+                user_image_set = UserImageSet.objects.get(id=id)
+                id = user_image_set.user.username
                 confidence = "  {0}%".format(round(100 - confidence))
             else:
                 id = "unknown"
@@ -66,17 +72,62 @@ class FaceRecognitionView(APIView):
 
 class TrainerView(APIView):
     def post(self, request):
-        pass
+        print(request.user)
+        user = request.user
+        user_image_set, created = UserImageSet.objects.get_or_create(user=user)
+        if created:
+            return JsonResponse({'status': False, "message": "No Face Images for User", "data": {"user": request.user.username}})
+        faceSamples = []
+        ids = []
+        for image in user_image_set.images.all():
+            pil_img = Image.open(image.face).convert('L')
+
+            print(pil_img)
+            img_numpy = np.array(pil_img, 'uint8')
+            # Convert RGB to BGR
+            faceSamples.append(img_numpy)
+            ids.append(user_image_set.id)
+            print(ids)
+
+        recognizer.update(faceSamples, np.array(ids))
+        recognizer.write(CURRENT_FOLDER + '/trainer/trainer.yml')
+
+        return JsonResponse({"status": True, "message": "Model Re-Trained for face.", "data": {"name": user.username}})
 
 
-class saveFace(APIView):
+class SaveFaceView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, )
 
     def post(self, request):
         print(request.user)
-        return JsonResponse({'status': True, "message": "Face Saved", "data": {"user": request.user.username}})
+        face = request.data.get('face')
+        if face:
+            format, imgstr = face.split(';base64,')
+            ext = format.split('/')[-1]
+            file_name = f'{request.user.username}.{int(time.time())}'
+            data = ContentFile(base64.b64decode(imgstr), name=file_name + ext)  # You can save this as file instance.
+            print(data)
 
+            face_obj = FaceImage(face=data, file_name=file_name)
+            face_obj.save()
 
-class createUser(APIView):
-    def post(self, request):
-        pass
+            user_image_set, created = UserImageSet.objects.get_or_create(user=request.user)
+
+            if created:
+                user_image_set.user = request.user
+
+            user_image_set.images.add(face_obj)
+
+            img_count = user_image_set.images.count()
+
+            return JsonResponse({
+                "status": True,
+                "message": "Face Saved.",
+                "data": {
+                    "num_images": img_count,
+                    "name": request.user.username
+                }
+            })
+        else:
+            return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})

@@ -7,6 +7,10 @@ recognition = 'src.recognition'
 
 router = routers.DefaultRouter()
 
-urlpatterns = [path("recognize-face", views.FaceRecognitionView.as_view()), path("save-face", views.saveFace.as_view())]
+urlpatterns = [
+    path("recognize-face", views.FaceRecognitionView.as_view()),
+    path("save-face", views.SaveFaceView.as_view()),
+    path("train-face", views.TrainerView.as_view())
+]
 
 urlpatterns += ()

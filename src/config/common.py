@@ -23,7 +23,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'jet',
+    # 'jet',
     'django.contrib.admin',
 
     # Third party apps
