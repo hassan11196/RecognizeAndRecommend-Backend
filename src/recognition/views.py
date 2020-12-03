@@ -58,6 +58,7 @@ class FaceRecognitionView(APIView):
 
             # Check if confidence is less them 100 ==> "0" is perfect match
             if (confidence < 100):
+                print(id)
                 user_image_set = UserImageSet.objects.get(id=id)
                 id = user_image_set.user.username
                 confidence = "  {0}%".format(round(100 - confidence))
