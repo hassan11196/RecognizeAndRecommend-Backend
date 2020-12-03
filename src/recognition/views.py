@@ -59,7 +59,7 @@ class FaceRecognitionView(APIView):
             # Check if confidence is less them 100 ==> "0" is perfect match
             if (confidence < 100):
                 print(id)
-                user_image_set = UserImageSet.objects.filter(id=id)[0]
+                user_image_set = UserImageSet.objects.filter(id=id).first()
                 if not user_image_set:
                     id = "Hassan"
                 else:
