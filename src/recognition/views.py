@@ -7,6 +7,7 @@ import numpy
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from django.core.files.base import ContentFile
 # Create your views here.
@@ -68,9 +69,12 @@ class TrainerView(APIView):
         pass
 
 
-class saveImage(APIView):
+class saveFace(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        pass
+        print(request.user)
+        return JsonResponse({'status': True, "message": "Face Saved", "data": {"user": request.user.username}})
 
 
 class createUser(APIView):
