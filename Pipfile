@@ -46,12 +46,11 @@ django-health-check = "==3.16.1"
 psycopg2-binary = "*"
 whitenoise = "*"
 Pillow = "*"
-opencv-contrib-python = "*"
-opencv-python = "==3.4.2.17"
+
 numpy = "*"
 django = "==3.0.8"
 markdown = "==3.2.2"
-opencv-python-headless = "==4.2.0.32"
+opencv-python-headless = "==3.4.11.43"
 
 [dev-packages]
 
