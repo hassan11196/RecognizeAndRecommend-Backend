@@ -62,14 +62,27 @@ class FaceRecognitionView(APIView):
                 user_image_set = UserImageSet.objects.filter(id=id).first()
                 if not user_image_set:
                     id = "Hassan"
+                    auth_token = 'DONT_USE_THIS_USER'
+
                 else:
                     id = user_image_set.user.username
+                    auth_token = str(user_image_set.user.auth_token)
+                    print(auth_token)
+
                 confidence = "  {0}%".format(round(100 - confidence))
             else:
                 id = "unknown"
                 confidence = "  {0}%".format(round(100 - confidence))
 
-            return JsonResponse({"status": True, "message": "Image Received.", "data": {"confidence": confidence, "name": id}})
+            return JsonResponse({
+                "status": True,
+                "message": "Image Received.",
+                "data": {
+                    "confidence": confidence,
+                    "name": id,
+                    "auth_token": auth_token
+                }
+            })
         else:
             return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})
 
