@@ -1,4 +1,52 @@
-# Python - Django Rest Framework boilerplate
+# Recognize And Recommend
+## Send Base64 of Face to 
+
+`POST /recognition/recognize-face`
+Request Body:
+```
+{
+  "face":"data:image/png;base64,iVB.."
+}
+```
+if it returns a username then user is registered.
+
+else if it returns unknown. prompt user for a username and send a base64 Face along with username to the following endpoint
+
+`POST localhost:8000/api/v1/users/`
+
+Request Body:
+``` 
+{
+  "username":"mustafa",
+  "profile_photo":"data:image/png;base64,iVBOR..."
+}
+```
+This endpoint returns a `auth_token`, save it. it will be used to authenticate the user with the server.
+
+To Save a user face for training
+send Base64 face along with `auth_token` in header.
+Call this api in a loop and send 30 different Base64 Faces.
+
+`POST localhost:8000/recognition/save-face`
+
+Request Body:
+```
+{
+  "face":"data:image/png;base64,iVB.."
+}
+```
+Headers:
+```
+Authorization : Token auth_token
+```
+
+After you have saved a users face, hit this api to start training.
+
+`POST localhost:8000/recognition/train-face`
+
+
+
+## Python - Django Rest Framework boilerplate
 
 This is boilerplate for starting fresh new DRF projects. It's built using [cookiecutter-django-rest](https://github.com/agconti/cookiecutter-django-rest).
 
