@@ -55,7 +55,7 @@ class FaceRecognitionView(APIView):
             confidence = None
 
             id, confidence = recognizer.predict(gray)
-
+            auth_token = ''
             # Check if confidence is less them 100 ==> "0" is perfect match
             if (confidence < 100):
                 print(id)
