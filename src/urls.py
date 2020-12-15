@@ -24,6 +24,7 @@ router.registry.extend(usersRouter.registry)
 urlpatterns = [
     # Recognjtion Endpoint
     path('recognition/', include('src.recognition.urls')),
+    path('recommendation/', include('src.recommendation.urls')),
 
     # admin panel
     path('admin/', admin.site.urls),
