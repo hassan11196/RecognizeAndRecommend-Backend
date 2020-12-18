@@ -10,23 +10,23 @@ class ProductPrice(models.Model):
         verbose_name = "Price"
         verbose_name_plural = "Prices"
 
-    symbol = models.CharField("symbol", max_length=50)
-    currency = models.CharField("currency", max_length=50)
-    current_price = models.FloatField("current_price")
-    discounted = models.BooleanField("discounted")
-    before_price = models.FloatField("before_price")
-    savings_amount = models.FloatField("savings_amount")
-    savings_percent = models.FloatField("savings_percent")
+    symbol = models.CharField("symbol", max_length=50, null=True, blank=True)
+    currency = models.CharField("currency", max_length=50, null=True, blank=True)
+    current_price = models.FloatField("current_price", null=True, blank=True)
+    discounted = models.BooleanField("discounted", null=True, blank=True)
+    before_price = models.FloatField("before_price", null=True, blank=True)
+    savings_amount = models.FloatField("savings_amount", null=True, blank=True)
+    savings_percent = models.FloatField("savings_percent", null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.symbol + ":" + self.currency
 
     def get_absolute_url(self):
         return reverse("price_detail", kwargs={"pk": self.pk})
 
 
 class Category(models.Model):
-    category = models.CharField("category", unique=True, max_length=50)
+    category = models.CharField("category", max_length=50)
     url = models.URLField("url", max_length=200)
 
     def __str__(self):
@@ -48,9 +48,9 @@ class ProductFeatureBullet(models.Model):
 
 
 class ProductReviewMetaData(models.Model):
-    total_reviews = models.IntegerField("total_reviews")
-    rating = models.FloatField("rating")
-    answered_questions = models.IntegerField("answered_questions")
+    total_reviews = models.IntegerField("total_reviews", null=True, blank=True)
+    rating = models.FloatField("rating", null=True, blank=True)
+    answered_questions = models.IntegerField("answered_questions", null=True, blank=True)
 
     def __str__(self):
         return self.total_reviews
@@ -77,19 +77,22 @@ class ProductVariant(models.Model):
 
 class Product(models.Model):
     asin = models.CharField("asin", primary_key=True, max_length=50)
-    sid = models.CharField("sid", max_length=50)
-    title = models.CharField(name='title', max_length=50)
-    description = models.TextField("description")
+    sid = models.CharField("sid", max_length=50, null=True, blank=True)
+    title = models.CharField(name='title', max_length=50, null=True, blank=True)
+    description = models.TextField("description", null=True, blank=True)
     categories = models.ManyToManyField("recommendation.Category", verbose_name="categories")
-    delivery_message = models.CharField("delivery_message", max_length=50)
+    delivery_message = models.CharField("delivery_message", max_length=50, null=True, blank=True)
     images = models.ManyToManyField("recommendation.ProductImage", verbose_name="ProductImages")
-    feature_bullets = models.ManyToManyField("recommendation.ProductFeatureBullet", verbose_name="ProductFeatureBullets")
-    item_available = models.BooleanField("item_available")
-    main_image = models.URLField("main_image", max_length=200)
+    feature_bullets = models.ManyToManyField("recommendation.ProductFeatureBullet",
+                                             verbose_name="ProductFeatureBullets",
+                                             null=True,
+                                             blank=True)
+    item_available = models.BooleanField("item_available", null=True, blank=True)
+    main_image = models.URLField("main_image", max_length=200, null=True, blank=True)
     also_bought = models.ManyToManyField("recommendation.Product")
     variants = models.ManyToManyField("recommendation.ProductVariant")
     reviews = models.ManyToManyField("recommendation.ProductReviewMetaData")
-    price = models.ForeignKey("recommendation.ProductPrice", on_delete=models.SET_NULL, null=True)
+    price = models.ForeignKey("recommendation.ProductPrice", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.asin + ":" + self.title

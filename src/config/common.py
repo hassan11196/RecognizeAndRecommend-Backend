@@ -46,13 +46,14 @@ INSTALLED_APPS = (
     'health_check.contrib.migrations',
     'health_check.contrib.celery_ping',  # requires celery
     'django_extensions',
+    'drf_generators',
     # Your apps
     'src.notifications',
     'src.users',
     'src.social',
     'src.common',
     'src.recognition',
-    'src.recommendation'
+    'src.recommendation',
 
     # Third party optional apps
     # app must be placed somewhere after all the apps that are going to be generating activities
@@ -323,7 +324,7 @@ REST_FRAMEWORK = {
     'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend', 'rest_framework.filters.OrderingFilter'],
     'PAGE_SIZE':
-    int(os.getenv('DJANGO_PAGINATION_LIMIT', 18)),
+    int(os.getenv('DJANGO_PAGINATION_LIMIT', 10)),
     'DATETIME_FORMAT':
     '%Y-%m-%dT%H:%M:%S.%fZ',
     'DEFAULT_RENDERER_CLASSES': (
