@@ -45,7 +45,7 @@ INSTALLED_APPS = (
     'health_check.storage',
     'health_check.contrib.migrations',
     'health_check.contrib.celery_ping',  # requires celery
-
+    'django_extensions',
     # Your apps
     'src.notifications',
     'src.users',
