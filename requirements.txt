@@ -146,3 +146,5 @@ whitenoise==5.2.0
 widgetsnbextension==3.5.1
 yapf==0.30.0
 zipp==3.4.0
+opencv-python-headless==3.4.2.17
+opencv-contrib-python-headless==3.4.2.17
