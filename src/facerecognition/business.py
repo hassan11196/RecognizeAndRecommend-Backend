@@ -20,7 +20,7 @@ def create_user(request):
     if not encode_images(request.FILES['image'],(name+ "." +str(number))):
         status = {"status":False,"message":"Unable To Detect Face In Image."}
         return status
-    status = add_user(request.FILES['image'],number+1,name)
+    status = add_user(request.FILES['image'],number,name)
     return status
 
 
@@ -142,15 +142,16 @@ def label_image(request):
             "data": {
                 "confidence": 0,
                 "name": face_names,
-                "auth_token": None
+                "auth_token": "DONT_USE_THIS_USER"
             }}
         else:
+            token = get_auth_token(face_names[0])
             return {"status": True,
             "message": "Image Received.",
             "data": {
                 "confidence": 100,
                 "name": face_names,
-                "auth_token": None
+                "auth_token": token
             }}
 
     return {"status": True,
