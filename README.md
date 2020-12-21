@@ -51,7 +51,7 @@ After you have saved a users face, hit this api to start training.
 get: http://127.0.0.1:8000/facerecognition/get_csrf
 
 #### To Train On Individual Image
-post: http://127.0.0.1:8000/person/add_person/
+post: http://127.0.0.1:8000/facerecognition/add_person/
 
 multipart form data:  
 
