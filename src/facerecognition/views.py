@@ -16,8 +16,8 @@ class CreatePersonView(View):
     def post(self,request):
         if(request.FILES['image'] is None):
             return JsonResponse({"status":False,"message":"Invalid Parameters"})
-        if os.stat(request.FILES['image']).st_size > 5242880:
-            return JsonResponse({"status":False,"message":"File Too Large"})
+        # if os.stat(request.FILES['image']).st_size > 5242880:
+        #     return JsonResponse({"status":False,"message":"File Too Large"})
 
         result = create_user(request)
         return JsonResponse(result)

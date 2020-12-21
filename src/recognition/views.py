@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from .models import FaceImage, UserImageSet
+from .business import create_user
 
 # Create your views here.
 recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -37,6 +38,7 @@ class FaceRecognitionView(APIView):
             format, imgstr = face.split(';base64,')
             ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)  # You can save this as file instance.
+
             print(data)
             pil_img = Image.open(data).convert('RGB')
 
@@ -113,12 +115,13 @@ class TrainerView(APIView):
 
 
 class SaveFaceView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, )
 
     def post(self, request):
         print(request.user)
         face = request.data.get('face')
+        username = request.data.get('username')
         if face:
             format, imgstr = face.split(';base64,')
             ext = format.split('/')[-1]
@@ -126,25 +129,30 @@ class SaveFaceView(APIView):
             data = ContentFile(base64.b64decode(imgstr), name=file_name + ext)  # You can save this as file instance.
             print(data)
 
-            face_obj = FaceImage(face=data, file_name=file_name)
-            face_obj.save()
+            result = create_user(username, data)
 
-            user_image_set, created = UserImageSet.objects.get_or_create(user=request.user)
+            return result
+        else:
+            return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})
 
-            if created:
-                user_image_set.user = request.user
 
-            user_image_set.images.add(face_obj)
+class CreateFaceView(APIView):
+    parser_classes = (JSONParser, )
 
-            img_count = user_image_set.images.count()
+    def post(self, request):
 
-            return JsonResponse({
-                "status": True,
-                "message": "Face Saved.",
-                "data": {
-                    "num_images": img_count,
-                    "name": request.user.username
-                }
-            })
+        face = request.data.get('face')
+        username = request.data.get('username')
+        if face:
+            format, imgstr = face.split(';base64,')
+
+            ext = format.split('/')[-1]
+            file_name = f'{request.user.username}.{int(time.time())}'
+            data = ContentFile(base64.b64decode(imgstr), name=file_name + ext)  # You can save this as file instance.
+            print(data)
+
+            result = create_user(username, data)
+
+            return JsonResponse(result)
         else:
             return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})

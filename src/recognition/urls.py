@@ -10,7 +10,8 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path("recognize-face", views.FaceRecognitionView.as_view()),
     path("save-face", views.SaveFaceView.as_view()),
-    path("train-face", views.TrainerView.as_view())
+    path("train-face", views.TrainerView.as_view()),
+    path("create-user", views.CreateFaceView.as_view()),
 ]
 
 urlpatterns += ()
