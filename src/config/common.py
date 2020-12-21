@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'src.common',
     'src.recognition',
     'src.recommendation',
+    'src.facerecognition',
 
     # Third party optional apps
     # app must be placed somewhere after all the apps that are going to be generating activities
