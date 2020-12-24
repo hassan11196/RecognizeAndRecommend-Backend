@@ -11,5 +11,6 @@ router.register(r'productfeaturebullet', views.ProductFeatureBulletViewSet, 'Pro
 router.register(r'productreviewmetadata', views.ProductReviewMetaDataViewSet, 'ProductReviewMetaData')
 router.register(r'productvariant', views.ProductVariantViewSet, 'ProductVariant')
 router.register(r'product', views.ProductViewSet, 'Product')
+router.register(r'productreview', views.ProductReviewViewSet, 'ProductReview')
 
 urlpatterns = router.urls
