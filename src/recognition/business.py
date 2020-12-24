@@ -78,10 +78,10 @@ def batch_image_train():
             person.delete()
 
 
-def label_image(request):
-    if not request.FILES['image']:
+def label_image(image):
+    if not image:
         return {"status": False, "message": "Invalid Parameters"}
-    frame = request.FILES['image']
+    frame = image
     frame = face_recognition.load_image_file(frame)
     file = open(os.path.join(directory, "../../facedump/face_names"), 'rb')
     known_face_names = pickle.load(file)
@@ -132,35 +132,32 @@ def label_image(request):
     #     cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
     #     font = cv2.FONT_HERSHEY_DUPLEX
     #     cv2.putText(frame, name, (left + 6, bottom - 6), font, 3.0, (255, 255, 255), 4)
-    if len(face_names) == 1:
+    print(face_names)
+    if len(face_names) >= 1:
         if (face_names[0] == 'Unknown'):
-            return {
-                "status": True,
-                "message": "Image Received.",
-                "data": {
-                    "confidence": 0,
-                    "name": face_names,
-                    "auth_token": "DONT_USE_THIS_USER"
-                }
-            }
+            return "unknown"
+            # return {
+            #     "status": True,
+            #     "message": "Image Received.",
+            #     "data": {
+            #         "confidence": 0,
+            #         "name": face_names,
+            #         "auth_token": "DONT_USE_THIS_USER"
+            #     }
+            # }
         else:
-            token = get_auth_token(face_names[0])
-            return {
-                "status": True,
-                "message": "Image Received.",
-                "data": {
-                    "confidence": 100,
-                    "name": face_names,
-                    "auth_token": token
-                }
-            }
-
-    return {
-        "status": True,
-        "message": "Image Received With Multiple Faces.",
-        "data": {
-            "confidence": 100,
-            "name": face_names,
-            "auth_token": None
-        }
-    }
+            return face_names[0].split('.')[1]
+            # token = get_auth_token(face_names[0])
+            # return {
+            #     "status": True,
+            #     "message": "Image Received.",
+            #     "data": {
+            #         "confidence": 100,
+            #         "name": face_names,
+            #         "auth_token": token
+            #     }
+            # }
+    elif len(face_names) == 0:
+        return "unknown"
+    else:
+        return "unknown"  # Multtiple Face Case

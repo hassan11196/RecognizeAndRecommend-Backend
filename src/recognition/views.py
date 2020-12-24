@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from .models import FaceImage, UserImageSet
-from .business import create_user
+from .business import create_user, label_image
 
 # Create your views here.
 recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -40,26 +40,9 @@ class FaceRecognitionView(APIView):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)  # You can save this as file instance.
 
             print(data)
-            pil_img = Image.open(data).convert('RGB')
-
-            print(pil_img)
-            img = np.array(pil_img)
-            # Convert RGB to BGR
-            img = img[:, :, ::-1].copy()
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-            # faces = faceCascade.detectMultiScale(
-            #     img,
-            #     scaleFactor=1.2,
-            #     minNeighbors=5,
-            #     minSize=(int(minW), int(minH)),
-            # )
-            confidence = None
-
-            id, confidence = recognizer.predict(gray)
-            auth_token = ''
-            # Check if confidence is less them 100 ==> "0" is perfect match
-            if (confidence < 100):
+            id = label_image(image=data)
+            print(id)
+            if (id != 'unknown'):
                 print(id)
                 user_image_set = UserImageSet.objects.filter(id=id).first()
                 if not user_image_set:
@@ -71,22 +54,22 @@ class FaceRecognitionView(APIView):
                     auth_token = str(user_image_set.user.auth_token)
                     print(auth_token)
 
-                confidence = "  {0}%".format(round(100 - confidence))
+                return JsonResponse({
+                    "status": True,
+                    "message": "Image Received.",
+                    "data": {
+                        "name": id,
+                        "auth_token": auth_token
+                    }
+                })
+
             else:
                 id = "unknown"
-                confidence = "  {0}%".format(round(100 - confidence))
 
-            return JsonResponse({
-                "status": True,
-                "message": "Image Received.",
-                "data": {
-                    "confidence": confidence,
-                    "name": id,
-                    "auth_token": auth_token
-                }
-            })
+                return JsonResponse({"status": True, "message": "Image Received.", "data": {"name": id}})
+
         else:
-            return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})
+            return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": {}})
 
 
 class TrainerView(APIView):
