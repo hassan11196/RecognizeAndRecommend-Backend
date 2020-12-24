@@ -137,8 +137,9 @@ class Product(models.Model):
 class ProductReview(models.Model):
     rating = models.FloatField(null=True, blank=True)
     verified = models.BooleanField(null=True, blank=True)
-    reviewTime = models.DateField(null=True, blank=True)
+    reviewTime = models.CharField(max_length=255, null=True, blank=True)
     asin = models.ForeignKey("recommendation.Product", on_delete=models.SET_NULL, null=True, blank=True)
+    reviewerID = models.CharField(max_length=255, null=True, blank=True)
     reviewerName = models.CharField(max_length=255, null=True, blank=True)
     reviewText = models.TextField(null=True, blank=True)
     summary = models.CharField(max_length=255, null=True, blank=True)
