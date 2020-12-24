@@ -1,14 +1,13 @@
-from django.shortcuts import render
+
 from django.views import View
 from django.http import JsonResponse
-from .models import Person
 from .business import *
 from django.middleware.csrf import get_token
 import os
 # Create your views here.
 
 class CSRFToken(View):
-    def get(self,request):
+    def get(self, request):
         return JsonResponse({'csrfToken': get_token(request)})
 
 

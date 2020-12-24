@@ -13,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from .models import FaceImage, UserImageSet
 from .business import create_user, label_image
+from ..users.models import User
 
 # Create your views here.
 recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -40,33 +41,35 @@ class FaceRecognitionView(APIView):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)  # You can save this as file instance.
 
             print(data)
-            id = label_image(image=data)
-            print(id)
-            if (id != 'unknown'):
-                print(id)
-                user_image_set = UserImageSet.objects.filter(id=id).first()
-                if not user_image_set:
-                    id = "Hassan"
-                    auth_token = 'DONT_USE_THIS_USER'
+            label_dict = label_image(image=data)
+            print(label_dict)
+            if (label_dict.get('status') == True):
 
+                if label_dict.get('data').get('message') == "face_unknown":
+                    id = label_dict.get('data').get('name')
+                    return JsonResponse({"status": False, "message": "Image Received. Face Unknown", "data": {"name": id}})
                 else:
-                    id = user_image_set.user.username
-                    auth_token = str(user_image_set.user.auth_token)
+                    id = label_dict.get('data').get('id')
+                    user = User.objects.filter(id=id).first()
+                    username = user.username
+                    auth_token = str(user.auth_token)
                     print(auth_token)
-
-                return JsonResponse({
-                    "status": True,
-                    "message": "Image Received.",
-                    "data": {
-                        "name": id,
-                        "auth_token": auth_token
-                    }
-                })
+                    return JsonResponse({
+                        "status": True,
+                        "message": "Image Received.",
+                        "data": {
+                            "name": username,
+                            "id": id,
+                            "auth_token": auth_token
+                        }
+                    })
 
             else:
-                id = "unknown"
-
-                return JsonResponse({"status": True, "message": "Image Received.", "data": {"name": id}})
+                return JsonResponse({
+                    "status": False,
+                    "message": "Image Received. Face Detection Error.",
+                    "data": label_dict.get('data')
+                })
 
         else:
             return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": {}})
@@ -124,7 +127,7 @@ class CreateFaceView(APIView):
 
     def post(self, request):
 
-        face = request.data.get('face')
+        face = request.data.get('profile_photo')
         username = request.data.get('username')
         if face:
             format, imgstr = face.split(';base64,')

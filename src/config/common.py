@@ -1,9 +1,6 @@
 import os
-import sentry_sdk
 import sys
 import dotenv
-
-from sentry_sdk.integrations.django import DjangoIntegration
 from os.path import join
 
 TESTING = sys.argv[1:2] == ['test']

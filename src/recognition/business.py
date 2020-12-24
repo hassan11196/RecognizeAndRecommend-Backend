@@ -81,18 +81,22 @@ def batch_image_train():
 def label_image(image):
     if not image:
         return {"status": False, "message": "Invalid Parameters"}
-    frame = image
-    frame = face_recognition.load_image_file(frame)
-    file = open(os.path.join(directory, "../../facedump/face_names"), 'rb')
-    known_face_names = pickle.load(file)
-    file.close()
-    file = open(os.path.join(directory, '../../facedump/face_encoding'), 'rb')
-    known_face_encodings = pickle.load(file)
-    file.close()
-    face_locations = []
-    face_encodings = []
-    face_names = []
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    try:
+
+        frame = image
+        frame = face_recognition.load_image_file(frame)
+        file = open(os.path.join(directory, "../../facedump/face_names"), 'rb')
+        known_face_names = pickle.load(file)
+        file.close()
+        file = open(os.path.join(directory, '../../facedump/face_encoding'), 'rb')
+        known_face_encodings = pickle.load(file)
+        file.close()
+        face_locations = []
+        face_encodings = []
+        face_names = []
+        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    except FileNotFoundError as e:
+        return {"status": False, "data": {"message": "error_file_not_found", "error": str(e)}}
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
     rgb_small_frame = small_frame[:, :, ::-1]
@@ -135,7 +139,7 @@ def label_image(image):
     print(face_names)
     if len(face_names) >= 1:
         if (face_names[0] == 'Unknown'):
-            return "unknown"
+            return {"status": True, "data": {"message": "face_unknown", "name": "unknown"}}
             # return {
             #     "status": True,
             #     "message": "Image Received.",
@@ -146,7 +150,10 @@ def label_image(image):
             #     }
             # }
         else:
-            return face_names[0].split('.')[1]
+            username =  face_names[0].split('.')[0]
+            id = face_names[0].split('.')[1]
+
+            return {"status": True, "data": {"message": "face_known", "name": username, "id": id}}
             # token = get_auth_token(face_names[0])
             # return {
             #     "status": True,
@@ -158,6 +165,6 @@ def label_image(image):
             #     }
             # }
     elif len(face_names) == 0:
-        return "unknown"
+        return {"status": False, "data": {"message": "no_face"}}
     else:
-        return "unknown"  # Multtiple Face Case
+        return {"status": False, "data": {"message": "multiple_face"}}
