@@ -57,6 +57,9 @@ drf-generators = "*"
 cmake = "*"
 face-recognition = "*"
 scikit-build = "*"
+pandas = "*"
+scipy = "*"
+sklearn = "*"
 
 [dev-packages]
 
