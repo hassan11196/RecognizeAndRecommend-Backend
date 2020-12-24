@@ -49,7 +49,6 @@ Pillow = "*"
 numpy = "*"
 django = "==3.0.8"
 markdown = "==3.2.2"
-opencv-python-headless = "==3.4.11.43"
 opencv-contrib-python = "*"
 django-extensions = "*"
 ipykernel = "*"
@@ -62,4 +61,4 @@ scikit-build = "*"
 [dev-packages]
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"

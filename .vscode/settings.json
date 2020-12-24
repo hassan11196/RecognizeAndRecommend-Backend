@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "/home/hassan11196/.local/share/virtualenvs/python-django-drf-boilerplate-FGyt0A6u/bin/python",
+  "python.pythonPath": "/home/noman/.local/share/virtualenvs/RecognizeAndRecommend-Backend-e795AR2-/bin/python",
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
