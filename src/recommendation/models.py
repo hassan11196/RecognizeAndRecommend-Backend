@@ -26,8 +26,11 @@ class ProductPrice(models.Model):
 
 
 class Category(models.Model):
-    category = models.CharField("category", max_length=50)
-    url = models.URLField("url", max_length=200)
+    category = models.CharField(
+        "category",
+        max_length=50,
+    )
+    url = models.URLField("url", max_length=200, primary_key=True)
 
     def __str__(self):
         return self.category
@@ -60,8 +63,9 @@ class ProductVariant(models.Model):
     """Model definition for ProductVariant."""
     # TODO: Define fields here
     asin = models.CharField("asin", primary_key=True, max_length=50)
-    variant = models.CharField("variant", max_length=50)
-    large_image = models.URLField("large_image", max_length=200)
+    title = models.CharField("variant", max_length=50)
+    image = models.URLField("image", max_length=200, null=True)
+    price = models.FloatField(null=True, blank=True)
 
     class Meta:
         """Meta definition for ProductVariant."""
@@ -91,7 +95,7 @@ class Product(models.Model):
     main_image = models.URLField("main_image", max_length=200, null=True, blank=True)
     also_bought = models.ManyToManyField("recommendation.Product")
     variants = models.ManyToManyField("recommendation.ProductVariant")
-    reviews = models.ManyToManyField("recommendation.ProductReviewMetaData")
+    reviews = models.ForeignKey("recommendation.ProductReviewMetaData", on_delete=models.SET_NULL, null=True)
     price = models.ForeignKey("recommendation.ProductPrice", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
@@ -132,3 +136,14 @@ class Product(models.Model):
         product.price = productPrice
 
         return product
+
+
+class ProductReview(models.Model):
+    rating = models.FloatField(null=True, blank=True)
+    verified = models.BooleanField(null=True, blank=True)
+    reviewTime = models.CharField(max_length=255, null=True, blank=True)
+    asin = models.ForeignKey("recommendation.Product", on_delete=models.SET_NULL, null=True, blank=True)
+    reviewerID = models.CharField(max_length=255, null=True, blank=True)
+    reviewerName = models.CharField(max_length=255, null=True, blank=True)
+    reviewText = models.TextField(null=True, blank=True)
+    summary = models.CharField(max_length=255, null=True, blank=True)

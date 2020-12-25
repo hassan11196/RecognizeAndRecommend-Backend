@@ -1,3 +1,4 @@
+from django.urls import path
 from rest_framework.routers import SimpleRouter
 from src.recommendation import views
 
@@ -11,5 +12,11 @@ router.register(r'productfeaturebullet', views.ProductFeatureBulletViewSet, 'Pro
 router.register(r'productreviewmetadata', views.ProductReviewMetaDataViewSet, 'ProductReviewMetaData')
 router.register(r'productvariant', views.ProductVariantViewSet, 'ProductVariant')
 router.register(r'product', views.ProductViewSet, 'Product')
+router.register(r'productreview', views.ProductReviewViewSet, 'ProductReview')
 
 urlpatterns = router.urls
+
+urlpatterns += [
+    path('recommended-products', views.RecommendedProductApiView.as_view()),
+    path('productreview-asin/<str:asin>', views.ProductReviewFromProductIdApiView.as_view())
+]

@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from src.recommendation.models import ProductPrice, Category, ProductImage, ProductFeatureBullet, ProductReviewMetaData, ProductVariant, Product
+from src.recommendation.models import ProductPrice, Category, ProductImage, ProductFeatureBullet, ProductReviewMetaData, ProductVariant, Product, ProductReview
 
 
 class ProductPriceSerializer(ModelSerializer):
@@ -48,4 +48,11 @@ class ProductSerializer(ModelSerializer):
 
     class Meta:
         model = Product
+        fields = '__all__'
+
+
+class ProductReviewSerializer(ModelSerializer):
+
+    class Meta:
+        model = ProductReview
         fields = '__all__'

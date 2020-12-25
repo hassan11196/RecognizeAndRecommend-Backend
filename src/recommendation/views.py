@@ -1,12 +1,38 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ViewSet
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from src.recommendation.serializers import ProductPriceSerializer, CategorySerializer, ProductImageSerializer, ProductFeatureBulletSerializer, ProductReviewMetaDataSerializer, ProductVariantSerializer, ProductSerializer
-from src.recommendation.models import ProductPrice, Category, ProductImage, ProductFeatureBullet, ProductReviewMetaData, ProductVariant, Product
+from rest_framework.permissions import IsAuthenticated
+from src.recommendation.serializers import ProductPriceSerializer, CategorySerializer, ProductImageSerializer, ProductFeatureBulletSerializer, ProductReviewMetaDataSerializer, ProductVariantSerializer, ProductSerializer, ProductReviewSerializer
+from src.recommendation.models import ProductPrice, Category, ProductImage, ProductFeatureBullet, ProductReviewMetaData, ProductVariant, Product, ProductReview
 
+from functools import reduce
+
+
+def hash_uuid(id, n):
+    return int(str(reduce(lambda a, b: a.encode("utf-8").hex() + b.encode("utf-8").hex(), id.split("-")))) % n
+
+
+class RecommendedProductApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        size = Product.objects.all().count() - 10
+        id = str(request.user.id)
+        offset = hash_uuid(id, size)
+        queryset = Product.objects.all()[offset:10]
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+class ProductReviewFromProductIdApiView(APIView):
+
+    def get(self, request, asin):
+        
+        queryset = ProductReview.objects.filter(asin_id=asin)
+        serializer = ProductReviewSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class ProductPriceViewSet(ViewSet):
-
     def list(self, request):
         queryset = ProductPrice.objects.order_by('pk')
         serializer = ProductPriceSerializer(queryset, many=True)
@@ -46,7 +72,6 @@ class ProductPriceViewSet(ViewSet):
 
 
 class CategoryViewSet(ViewSet):
-
     def list(self, request):
         queryset = Category.objects.order_by('pk')
         serializer = CategorySerializer(queryset, many=True)
@@ -86,7 +111,6 @@ class CategoryViewSet(ViewSet):
 
 
 class ProductImageViewSet(ViewSet):
-
     def list(self, request):
         queryset = ProductImage.objects.order_by('pk')
         serializer = ProductImageSerializer(queryset, many=True)
@@ -126,7 +150,6 @@ class ProductImageViewSet(ViewSet):
 
 
 class ProductFeatureBulletViewSet(ViewSet):
-
     def list(self, request):
         queryset = ProductFeatureBullet.objects.order_by('pk')
         serializer = ProductFeatureBulletSerializer(queryset, many=True)
@@ -166,7 +189,6 @@ class ProductFeatureBulletViewSet(ViewSet):
 
 
 class ProductReviewMetaDataViewSet(ViewSet):
-
     def list(self, request):
         queryset = ProductReviewMetaData.objects.order_by('pk')
         serializer = ProductReviewMetaDataSerializer(queryset, many=True)
@@ -206,7 +228,6 @@ class ProductReviewMetaDataViewSet(ViewSet):
 
 
 class ProductVariantViewSet(ViewSet):
-
     def list(self, request):
         queryset = ProductVariant.objects.order_by('pk')
         serializer = ProductVariantSerializer(queryset, many=True)
@@ -246,7 +267,6 @@ class ProductVariantViewSet(ViewSet):
 
 
 class ProductViewSet(ViewSet):
-
     def list(self, request):
         queryset = Product.objects.order_by('pk')
         serializer = ProductSerializer(queryset, many=True)
@@ -280,6 +300,45 @@ class ProductViewSet(ViewSet):
         try:
             item = Product.objects.get(pk=pk)
         except Product.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
+
+
+class ProductReviewViewSet(ViewSet):
+    def list(self, request):
+        queryset = ProductReview.objects.order_by('pk')
+        serializer = ProductReviewSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = ProductReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+    def retrieve(self, request, pk=None):
+        queryset = ProductReview.objects.all()
+        item = get_object_or_404(queryset, pk=pk)
+        serializer = ProductReviewSerializer(item)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        try:
+            item = ProductReview.objects.get(pk=pk)
+        except ProductReview.DoesNotExist:
+            return Response(status=404)
+        serializer = ProductReviewSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def destroy(self, request, pk=None):
+        try:
+            item = ProductReview.objects.get(pk=pk)
+        except ProductReview.DoesNotExist:
             return Response(status=404)
         item.delete()
         return Response(status=204)

@@ -45,6 +45,41 @@ After you have saved a users face, hit this api to start training.
 `POST localhost:8000/recognition/train-face`
 
 
+# FACE RECOGNITION 2
+
+#### To Get CSRFMIDDLEWARETOKEN
+get: http://127.0.0.1:8000/facerecognition/get_csrf
+
+#### To Train On Individual Image
+post: http://127.0.0.1:8000/facerecognition/add_person/
+
+multipart form data:  
+
+csrfmiddlewaretoken = ""
+name = ""
+image = ""  //Image File
+
+#### To Store Person Data Temporily for later training
+post: http://127.0.0.1:8000/facerecognition/add_temp_person/
+
+multipart form data:  
+
+csrfmiddlewaretoken = ""
+name = ""
+image = ""  //Image File
+
+#### To Train All Temporily Stored Images
+get: http://127.0.0.1:8000/facerecognition/batch_train/
+
+#### To Get Face Label
+post: http://127.0.0.1:8000/facerecognition/get_label/
+
+multipart form data:  
+
+csrfmiddlewaretoken = ""
+image = ""  //Image File
+
+
 
 ## Python - Django Rest Framework boilerplate
 

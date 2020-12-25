@@ -41,6 +41,9 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/v1/login/', views.obtain_auth_token),
 
+    # FACERECOGNITION
+    path('facerecognition/', include('src.facerecognition.urls')),
+
     # social login
     url('', include('social_django.urls', namespace='social')),
     url(r'^complete/twitter/', complete_twitter_login),

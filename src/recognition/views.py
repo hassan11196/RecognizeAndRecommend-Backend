@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser
 from .models import FaceImage, UserImageSet
+from .business import create_user, label_image
+from ..users.models import User
 
 # Create your views here.
 recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -37,54 +39,40 @@ class FaceRecognitionView(APIView):
             format, imgstr = face.split(';base64,')
             ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)  # You can save this as file instance.
+
             print(data)
-            pil_img = Image.open(data).convert('RGB')
+            label_dict = label_image(image=data)
+            print(label_dict)
+            if (label_dict.get('status') == True):
 
-            print(pil_img)
-            img = np.array(pil_img)
-            # Convert RGB to BGR
-            img = img[:, :, ::-1].copy()
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-            # faces = faceCascade.detectMultiScale(
-            #     img,
-            #     scaleFactor=1.2,
-            #     minNeighbors=5,
-            #     minSize=(int(minW), int(minH)),
-            # )
-            confidence = None
-
-            id, confidence = recognizer.predict(gray)
-            auth_token = ''
-            # Check if confidence is less them 100 ==> "0" is perfect match
-            if (confidence < 100):
-                print(id)
-                user_image_set = UserImageSet.objects.filter(id=id).first()
-                if not user_image_set:
-                    id = "Hassan"
-                    auth_token = 'DONT_USE_THIS_USER'
-
+                if label_dict.get('data').get('message') == "face_unknown":
+                    id = label_dict.get('data').get('name')
+                    return JsonResponse({"status": False, "message": "Image Received. Face Unknown", "data": {"name": id}})
                 else:
-                    id = user_image_set.user.username
-                    auth_token = str(user_image_set.user.auth_token)
+                    id = label_dict.get('data').get('id')
+                    user = User.objects.filter(id=id).first()
+                    username = user.username
+                    auth_token = str(user.auth_token)
                     print(auth_token)
+                    return JsonResponse({
+                        "status": True,
+                        "message": "Image Received.",
+                        "data": {
+                            "name": username,
+                            "id": id,
+                            "auth_token": auth_token
+                        }
+                    })
 
-                confidence = "  {0}%".format(round(100 - confidence))
             else:
-                id = "unknown"
-                confidence = "  {0}%".format(round(100 - confidence))
+                return JsonResponse({
+                    "status": False,
+                    "message": "Image Received. Face Detection Error.",
+                    "data": label_dict.get('data')
+                })
 
-            return JsonResponse({
-                "status": True,
-                "message": "Image Received.",
-                "data": {
-                    "confidence": confidence,
-                    "name": id,
-                    "auth_token": auth_token
-                }
-            })
         else:
-            return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})
+            return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": {}})
 
 
 class TrainerView(APIView):
@@ -113,12 +101,13 @@ class TrainerView(APIView):
 
 
 class SaveFaceView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, )
 
     def post(self, request):
         print(request.user)
         face = request.data.get('face')
+        username = request.data.get('username')
         if face:
             format, imgstr = face.split(';base64,')
             ext = format.split('/')[-1]
@@ -126,25 +115,30 @@ class SaveFaceView(APIView):
             data = ContentFile(base64.b64decode(imgstr), name=file_name + ext)  # You can save this as file instance.
             print(data)
 
-            face_obj = FaceImage(face=data, file_name=file_name)
-            face_obj.save()
+            result = create_user(username, data)
 
-            user_image_set, created = UserImageSet.objects.get_or_create(user=request.user)
+            return result
+        else:
+            return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})
 
-            if created:
-                user_image_set.user = request.user
 
-            user_image_set.images.add(face_obj)
+class CreateFaceView(APIView):
+    parser_classes = (JSONParser, )
 
-            img_count = user_image_set.images.count()
+    def post(self, request):
 
-            return JsonResponse({
-                "status": True,
-                "message": "Face Saved.",
-                "data": {
-                    "num_images": img_count,
-                    "name": request.user.username
-                }
-            })
+        face = request.data.get('profile_photo')
+        username = request.data.get('username')
+        if face:
+            format, imgstr = face.split(';base64,')
+
+            ext = format.split('/')[-1]
+            file_name = f'{request.user.username}.{int(time.time())}'
+            data = ContentFile(base64.b64decode(imgstr), name=file_name + ext)  # You can save this as file instance.
+            print(data)
+
+            result = create_user(username, data)
+
+            return JsonResponse(result)
         else:
             return JsonResponse({"status": False, "message": "Face Base64 not provided.", "data": []})
