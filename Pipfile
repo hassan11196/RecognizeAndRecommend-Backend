@@ -54,7 +54,9 @@ cmake = "*"
 face-recognition = "*"
 pandas = "*"
 scipy = "*"
-
+implicit = "*"
+scikit-learn = "*"
+scikit-surprise = "*"
 
 [dev-packages]
 
